@@ -1,0 +1,11 @@
+activate env
+
+```bash
+source ~/.venvs/pf/bin/activate
+```
+
+## Postgres
+
+remove: psql postgres -> DROP DATABASE pf;
+create: createdb pf
+connect: psql -U genbs postgres

@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Categories {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique
+  description  String?
+  transactions Transactions[]
+
+  @@map("categories")
+}
+
+model Accounts {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique
+  reference    String?
+  transactions Transactions[]
+
+  @@map("accounts")
+}
+
+model Transactions {
+  id             Int              @id @default(autoincrement())
+  started_date   DateTime?
+  completed_date DateTime?
+  description    String?
+  notes          String?
+  amount         Float?
+  fee            Float?
+  currency       String?
+  type           String
+  account        Accounts         @relation(fields: [account_id], references: [id])
+  account_id     Int
+  category       Categories?       @relation(fields: [category_id], references: [id])
+  category_id    Int?
+  tags           TransactionTag[]
+
+  @@map("transactions")
+}
+
+model TransactionTag {
+  transaction    Transactions @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
+  transaction_id Int
+  tag            Tags         @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+  tag_id         Int
+
+  @@id([transaction_id, tag_id])
+  @@map("transactions_tags")
+}
+
+model Tags {
+  id           Int              @id @default(autoincrement())
+  name         String           @unique
+  transactions TransactionTag[]
+
+  @@map("tags")
+}
