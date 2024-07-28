@@ -31,17 +31,17 @@ model Accounts {
 
 model Transactions {
   id             Int              @id @default(autoincrement())
-  started_date   DateTime?
-  completed_date DateTime?
+  started_date   DateTime
+  completed_date DateTime
   description    String?
   notes          String?
-  amount         Float?
-  fee            Float?
+  amount         Float
+  fee            Float
   currency       String?
-  type           String
+  type           Type
   account        Accounts         @relation(fields: [account_id], references: [id])
   account_id     Int
-  category       Categories?       @relation(fields: [category_id], references: [id])
+  category       Categories?      @relation(fields: [category_id], references: [id])
   category_id    Int?
   tags           TransactionTag[]
 
@@ -64,4 +64,9 @@ model Tags {
   transactions TransactionTag[]
 
   @@map("tags")
+}
+
+enum Type {
+  incoming
+  outgoing
 }

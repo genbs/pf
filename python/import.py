@@ -2,7 +2,7 @@
 import datetime 
 from importer.providers.poste import get_data as poste_data, resolve_data as poste_resolve_data
 from importer.providers.revolut import get_data as revolut_data
-from db.db import init as init_db
+from db.db import init as init_db, backup as backup_db
 from db.utils import find_or_create_account, add_transaction_if_not_exists
 import json
 
@@ -73,6 +73,7 @@ def revolut_record_to_transaction(record, account_id):
     }
 
 '''Init db'''
+backup_db()
 init_db()
 
 '''Import data'''

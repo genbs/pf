@@ -5,18 +5,19 @@ import os
 conn = None
 cursor = None
 
-def init():
-    global conn, cursor
-    
-    database='pf'
-    user='postgres'
-    password=''
-    host='localhost'
-    port='5432'
+database='pf'
+user='postgres'
+password=''
+host='localhost'
+port='5432'
 
+def backup():
     location = f'../backups/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.sql'
     command = f'pg_dump -U {user} -h {host} -p {port} -d {database} -W -f {location}'
     os.system(command)
+
+def init():
+    global conn, cursor
     
     conn = psycopg2.connect(
         database=database,
