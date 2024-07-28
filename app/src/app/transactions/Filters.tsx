@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client"
 import { Checkbox, FormControlLabel, FormGroup, TextField } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import React from "react"
+import { MONTHS } from "../types"
 
 interface FilterProps {
 	years: number[]
@@ -21,21 +22,6 @@ export interface FilterState {
 	type: ("incoming" | "outgoing")[]
 	currencies: string[]
 }
-
-export const MONTHS = [
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-]
 
 export default function Filters(props: FilterProps) {
 	const [ctrlKey, setCtrlKey] = React.useState(false)

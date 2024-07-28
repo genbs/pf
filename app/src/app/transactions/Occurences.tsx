@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client"
 
 import Fuse from "fuse.js"
 import React from "react"
+import TransactionModal from "../components/TransactionModal"
 
 export default function Occurrences({ transactions }: { transactions: Prisma.$TransactionsPayload["scalars"][] }) {
 	// voglio sapere le spese mensili riccorenti, per ogni transazione vedere la descrizione e contare quante volte compare nei mesi
@@ -16,16 +17,13 @@ export default function Occurrences({ transactions }: { transactions: Prisma.$Tr
 				keys: ["description"],
 				threshold,
 				isCaseSensitive: false,
-				useExtendedSearch: false,
-				// distance: 10,
-				//ignoreLocation: false,
-				//ignoreFieldNorm: false,
 			}),
 		[transactions, threshold]
 	)
 
 	if (typeof window === "undefined") return
 
+	//@ts-ignore
 	React.useEffect(() => {
 		const occurrences: Record<string, { ids: number[]; count: number }> = {}
 
@@ -54,7 +52,12 @@ export default function Occurrences({ transactions }: { transactions: Prisma.$Tr
 			{occurrences.map(({ ids, count, description }) => (
 				<div key={description}>
 					<h3>{description}</h3>
-					<p>{ids.join(", ")}</p>
+					<p>
+						{ids.map(id => {
+							const transaction = transactions.find(transaction => transaction.id === id)
+							return transaction ? <TransactionModal key={id} transaction={transaction} /> : id
+						})}
+					</p>
 					<p>{count}</p>
 				</div>
 			))}

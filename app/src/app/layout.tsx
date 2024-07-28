@@ -1,6 +1,7 @@
-import CssBaseline from "@mui/material/CssBaseline"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import React from "react"
+import App from "./app"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -21,8 +22,7 @@ export default function RootLayout({
 				<meta name="viewport" content="initial-scale=1, width=device-width" />
 			</head>
 			<body className={inter.className}>
-				<CssBaseline />
-				{children}
+				<App>{children}</App>
 			</body>
 		</html>
 	)

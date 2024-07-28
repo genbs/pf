@@ -2,6 +2,7 @@
 import { Prisma } from "@prisma/client"
 import React, { useState } from "react"
 
+import { useSearch } from "@/utils"
 import { Stack } from "@mui/material"
 import { DataGrid, GridColDef } from "@mui/x-data-grid"
 import Fuse from "fuse.js"
@@ -77,10 +78,21 @@ export default function Transactions(props: TransactionsProps) {
 	]
 
 	const fuse = React.useMemo(
-		() => new Fuse(props.transactions, { keys: ["description"], threshold: 0.3 }),
+		() =>
+			new Fuse(props.transactions, {
+				keys: ["description"],
+				threshold: 0.3,
+				isCaseSensitive: false,
+				// @ts-ignore
+				getFn: (obj: any, path: string) => {
+					return obj[path].split(" ")
+				},
+			}),
 		[props.transactions]
 	)
-	const fuseResults = React.useMemo(() => fuse.search(filterState.search), [fuse, filterState.search])
+
+	const fuseResults = useSearch(filterState.search, props.transactions, "description")
+
 	const transactions = props.transactions.filter(
 		transaction =>
 			filterState.years.includes(transaction.started_date.getFullYear()) &&
