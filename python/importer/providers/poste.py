@@ -116,7 +116,7 @@ def resolve_data(file, provider_name):
         if row['operazione'] in exclude_rows:
             continue
 
-        row['import_hash'] = hashlib.sha256(f'{file}_{str(index)}_{str(row)}'.encode()).hexdigest()
+        row['import_hash'] = hashlib.sha256(f'{str(index)}_{str(row)}'.encode()).hexdigest()
         if row['operazione'] == 'TOTALE ENTRATE':
             totale_entrate = to_float(row['accrediti'])
         elif row['operazione'] == 'TOTALE USCITE':

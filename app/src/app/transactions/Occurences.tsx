@@ -25,24 +25,19 @@ export default function Occurrences({ transactions }: { transactions: Prisma.$Tr
 
 	//@ts-ignore
 	React.useEffect(() => {
-		const occurrences: Record<string, { ids: number[]; count: number }> = {}
-
-		transactions.forEach(transaction => {
-			const results = fuse.search(transaction.description || "")
-
-			if (!results.length) return
-
-			const key = results[0].item.description || ""
-			if (!occurrences[key]) occurrences[key] = { ids: [], count: 0 }
-
-			occurrences[key].ids.push(transaction.id)
-			occurrences[key].count++
-		})
-		const sorted = Object.entries(occurrences)
-			.map(([description, { ids, count }]) => ({ description, ids, count }))
-			.sort((a, b) => b.count - a.count)
-
-		setOccurrences(sorted)
+		// const occurrences: Record<string, { ids: number[]; count: number }> = {}
+		// transactions.forEach(transaction => {
+		// 	const results = fuse.search(transaction.description || "")
+		// 	if (!results.length) return
+		// 	const key = results[0].item.description || ""
+		// 	if (!occurrences[key]) occurrences[key] = { ids: [], count: 0 }
+		// 	occurrences[key].ids.push(transaction.id)
+		// 	occurrences[key].count++
+		// })
+		// const sorted = Object.entries(occurrences)
+		// 	.map(([description, { ids, count }]) => ({ description, ids, count }))
+		// 	.sort((a, b) => b.count - a.count)
+		// setOccurrences(sorted)
 	}, [transactions, fuse, threshold])
 
 	return (

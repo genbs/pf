@@ -5,13 +5,14 @@ import React, { useState } from "react"
 import { useSearch } from "@/utils"
 import { Stack } from "@mui/material"
 import { DataGrid, GridColDef } from "@mui/x-data-grid"
-import Fuse from "fuse.js"
+import { Account, Tag, Transaction, TransactionTag } from "../types"
 import Filters, { FilterState } from "./Filters"
 import Occurrences from "./Occurences"
 
 interface TransactionsProps {
-	transactions: Prisma.$TransactionsPayload["scalars"][]
-	accounts: Prisma.$AccountsPayload["scalars"][]
+	transactions: Transaction[]
+	accounts: Account[]
+	tags: Tag[]
 }
 
 const defaultFilterState: (years: number[], accounts: number[], currencies: string[]) => FilterState = (
@@ -67,6 +68,7 @@ export default function Transactions(props: TransactionsProps) {
 		},
 		{ field: "type", headerName: "Type", flex: 0 },
 		{ field: "description", headerName: "Description", flex: 4 },
+		{ field: "label", headerName: "Label", flex: 4 },
 		{ field: "amount", headerName: "Amount", flex: 1 },
 		{ field: "currency", headerName: "Currency", flex: 1 },
 		{
@@ -75,23 +77,21 @@ export default function Transactions(props: TransactionsProps) {
 			flex: 1,
 			valueGetter: params => accountsMap[params as number]?.name ?? "Unknown",
 		},
+		{
+			field: "fee",
+			headerName: "Fee",
+			flex: 1,
+		},
+		{
+			field: "tags",
+			headerName: "Tags",
+			flex: 1,
+			valueGetter: params =>
+				(params as TransactionTag[]).map(tag => props.tags.find(t => tag.tag_id === t.id)?.name).join(", "),
+		},
 	]
-
-	const fuse = React.useMemo(
-		() =>
-			new Fuse(props.transactions, {
-				keys: ["description"],
-				threshold: 0.3,
-				isCaseSensitive: false,
-				// @ts-ignore
-				getFn: (obj: any, path: string) => {
-					return obj[path].split(" ")
-				},
-			}),
-		[props.transactions]
-	)
-
-	const fuseResults = useSearch(filterState.search, props.transactions, "description")
+	console.log(props.transactions)
+	const fuseResults = useSearch(filterState.search, props.transactions, ["description", "label"])
 
 	const transactions = props.transactions.filter(
 		transaction =>

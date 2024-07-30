@@ -33,7 +33,8 @@ model Transactions {
   id             Int              @id @default(autoincrement())
   started_date   DateTime
   completed_date DateTime
-  description    String?
+  description    String
+  label          String?
   notes          String?
   amount         Float
   fee            Float
@@ -55,7 +56,7 @@ model TransactionTag {
   tag_id         Int
 
   @@id([transaction_id, tag_id])
-  @@map("transactions_tags")
+  @@map("transaction_tag")
 }
 
 model Tags {

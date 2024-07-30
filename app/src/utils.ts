@@ -1,9 +1,9 @@
 import Fuse from "fuse.js"
 import React from "react"
 
-export function createSearch<T>(items: T[], key: keyof T) {
+export function createSearch<T>(items: T[], keys: (keyof T)[]) {
 	const fuse = new Fuse(items, {
-		keys: [key as string],
+		keys: keys as string[],
 		threshold: 0.1,
 		isCaseSensitive: false,
 		includeScore: true,
@@ -22,11 +22,10 @@ export function createSearch<T>(items: T[], key: keyof T) {
 	return searchFn
 }
 
-export function useSearch(input: string, items: any[], key: string) {
+export function useSearch(input: string, items: any[], keys: string[]) {
 	const workerRef = React.useRef<Worker>()
 
 	const [result, setResult] = React.useState<{ item: any; score: number }[]>([])
-	const [searchFn, setSearchFn] = React.useState<Function>(() => () => [])
 
 	React.useEffect(() => {
 		workerRef.current = new Worker(new URL("./transactionsSearchWorker.ts", import.meta.url))
@@ -39,17 +38,13 @@ export function useSearch(input: string, items: any[], key: string) {
 	React.useEffect(() => {
 		if (!workerRef.current) return
 
-		workerRef.current.postMessage(JSON.stringify({ event: "createSearch", data: { items, key } }))
+		workerRef.current.postMessage(JSON.stringify({ event: "createSearch", data: { items, keys } }))
 
 		function handleCreateSearchResult(e: MessageEvent) {
 			const { event } = JSON.parse(e.data)
 
 			switch (event) {
 				case "createSearchResult":
-					const searchFn = (query: string) => {
-						workerRef.current?.postMessage(JSON.stringify({ event: "search", data: { query } }))
-					}
-					setSearchFn(() => searchFn)
 					break
 			}
 		}
@@ -59,10 +54,10 @@ export function useSearch(input: string, items: any[], key: string) {
 		return () => {
 			workerRef.current?.removeEventListener("message", handleCreateSearchResult)
 		}
-	}, [workerRef, items, key])
+	}, [workerRef, items, keys])
 
 	React.useEffect(() => {
-		if (!workerRef.current || !searchFn || input.length < 2) return
+		if (!workerRef.current || input.length < 2) return
 
 		function handleSearchResult(e: MessageEvent) {
 			const { event, data } = JSON.parse(e.data)
@@ -75,12 +70,12 @@ export function useSearch(input: string, items: any[], key: string) {
 
 		workerRef.current.addEventListener("message", handleSearchResult)
 
-		searchFn(input)
+		workerRef.current?.postMessage(JSON.stringify({ event: "search", data: { query: input } }))
 
 		return () => {
 			workerRef.current?.removeEventListener("message", handleSearchResult)
 		}
-	}, [workerRef, searchFn, input])
+	}, [workerRef, input])
 
 	return result
 }

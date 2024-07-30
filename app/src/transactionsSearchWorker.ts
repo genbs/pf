@@ -7,17 +7,18 @@ addEventListener("message", async e => {
 
 	switch (event) {
 		case "createSearch":
-			const { items, key } = data
+			const { items, keys } = data
 			postMessage(JSON.stringify({ event: "createSearchStart", data: items.length }))
 
 			fuse = new Fuse(items, {
-				keys: [key],
+				keys: keys,
 				threshold: 0.1,
 				isCaseSensitive: false,
 				includeScore: true,
 				useExtendedSearch: true,
 				// @ts-ignore
 				getFn: (obj: any, path: string): string | string[] => {
+					if (!obj[path]) return ""
 					return [obj[path], ...obj[path].split(" ")]
 				},
 			})

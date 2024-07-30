@@ -51,15 +51,21 @@ def insert(table, data):
     query = f'INSERT INTO {table} ({columns}) VALUES ({placeholders})'
     cursor.execute(query, values)
     conn.commit()
-    cursor.execute('SELECT LASTVAL()')
-    last_id = cursor.fetchone()[0]
-    if not last_id:
-        raise Exception('Error inserting data', data)
-    return last_id
+    if cursor.lastrowid:
+        return cursor.lastrowid
+    return None
 
 def find(table, columns, property, value):
     cursor.execute(f'SELECT {columns} FROM {table} WHERE LOWER({property}) LIKE ?', (f'%{value.lower()}%',))
     return cursor.fetchall()
+
+def query(sql, values = None):
+    if values:
+        cursor.execute(sql, values)
+    else:
+        cursor.execute(sql)
+    conn.commit()
+    return cursor
 
 def select(table, columns = '*', where = None):
     if where:

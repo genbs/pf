@@ -29,7 +29,7 @@ def resolve_data(file):
         reader = csv.DictReader(f)
         for index, row in enumerate(reader):
             row = {key: value.encode('utf-8').decode('unicode_escape').encode('latin1').decode('utf-8') for key, value in row.items()}
-            row['import_hash'] = hashlib.sha256(f'{file}_{str(index)}_{str(row)}'.encode()).hexdigest()
+            row['import_hash'] = hashlib.sha256(f'{str(index)}_{str(row)}'.encode()).hexdigest()
             data.append(row)
 
     # Type: TOPUP ricarica, CARD PAYMENT pagamento con carta,TRANSFER pagamento verso altro revolut
